@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.awsvalley.selenum_demo</groupId>
+  <artifactId>selenum_demo</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>selenum_demo</name>
+  <url>http://www.example.com</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    
+    <!-- Dependency Versions -->
+    <selenium.version>4.11.0</selenium.version>
+    <testng.version>7.10.2</testng.version>
+    <webdrivermanager.version>5.9.2</webdrivermanager.version>
+    <mysql.connector.version>8.2.0</mysql.connector.version>
+    <log4j.version>2.20.0</log4j.version>
+    <extentreports.version>5.1.1</extentreports.version>
+    <commons-io.version>2.15.1</commons-io.version>
+    
+    <!-- ZAP Versions -->
+    <zap.core.version>2.14.0</zap.core.version> <!-- NEW: Added for the core ZAP dependency -->
+    <zap.clientapi.version>1.16.0</zap.clientapi.version>
+  </properties>
+
+  <dependencies>
+    <!-- Selenium -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+
+    <!-- TestNG -->
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- WebDriverManager -->
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <version>${webdrivermanager.version}</version>
+    </dependency>
+
+    <!-- MySQL Connector -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>${mysql.connector.version}</version>
+    </dependency>
+
+    <!-- Modern Logging (Log4j2) -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>${log4j.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Modern ExtentReports -->
+    <dependency>
+      <groupId>com.aventstack</groupId>
+      <artifactId>extentreports</artifactId>
+      <version>${extentreports.version}</version>
+    </dependency>
+
+    <!-- Commons IO -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons-io.version}</version>
+    </dependency>
+
+    <!-- ZAP Core Dependency (NEW) -->
+    <!-- This is required to embed ZAP in your application and resolve org.parosproxy imports -->
+    <dependency>
+        <groupId>org.zaproxy</groupId>
+        <artifactId>zap</artifactId>
+        <version>${zap.core.version}</version>
+    </dependency>
+
+    <!-- ZAP Client API -->
+    <dependency>
+      <groupId>org.zaproxy</groupId>
+      <artifactId>zap-clientapi</artifactId>
+      <version>${zap.clientapi.version}</version>
+    </dependency>
+    
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- Maven Surefire Plugin to run TestNG tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <suiteXmlFiles>
+            <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+          </suiteXmlFiles>
+        </configuration>
+      </plugin>
+
+      <!-- Maven Compiler Plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+        </configuration>
+      </plugin>
+
+      <!-- JaCoCo Code Coverage Plugin -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.11</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- OWASP Dependency-Check Plugin -->
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>9.0.10</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <format>ALL</format>
+          <outputDirectory>${project.build.directory}/dependency-check</outputDirectory>
+          <failBuildOnCVSS>7</failBuildOnCVSS>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

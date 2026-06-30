@@ -1,0 +1,29 @@
+services:
+  # The Selenium Grid Hub, which receives all test requests
+  selenium-hub:
+    image: selenium/hub:4.11.0 # Use a stable version tag
+    container_name: selenium-hub
+    ports:
+      - "4444:4444" # Expose the Grid port to your host machine
+
+  # A Chrome Node that registers with the Hub
+  chrome-node:
+    image: selenium/node-chrome:4.11.0
+    container_name: chrome-node
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+
+  # A Firefox Node that registers with the Hub
+  firefox-node:
+    image: selenium/node-firefox:4.11.0
+    container_name: firefox-node
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
