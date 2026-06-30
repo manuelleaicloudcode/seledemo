@@ -1,4 +1,4 @@
-name: APIsec
+name: Docker Image Scan
 
 on:
   push:
@@ -13,25 +13,34 @@ permissions:
   contents: read
 
 jobs:
-  scan:
+  build-and-scan:
     runs-on: ubuntu-latest
     steps:
-      - name: APIsec scan
-        uses: apisec-inc/apisec-run-scan@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t myapp:latest .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.20.0
         with:
-          apisec-username: ${{ secrets.APISEC_USERNAME }}
-          apisec-password: ${{ secrets.APISEC_PASSWORD }}
-          apisec-project: "VAmPI"
-          sarif-result-file: "apisec-results.sarif"
+          image-ref: myapp:latest
+          format: sarif
+          output: trivy-results.sarif
 
       - name: Upload SARIF artifact
         uses: actions/upload-artifact@v4
         with:
           name: sarif-results
-          path: apisec-results.sarif
+          path: trivy-results.sarif
 
   upload-results:
-    needs: scan
+    needs: build-and-scan
     permissions:
       security-events: write
       actions: read
@@ -45,7 +54,7 @@ jobs:
         with:
           name: sarif-results
 
-      - name: Import results
+      - name: Import results into GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: apisec-results.sarif
+          sarif_file: trivy-results.sarif
